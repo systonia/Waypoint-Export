@@ -4,7 +4,7 @@ Table downloads for [Waypoint](https://github.com/Systonia/Waypoint). Return a `
 and the browser gets a file in the format its extension names: CSV, JSON Lines, HTML, XML with schema,
 XLSX or ODS, all written without external libraries and streamed row by row. The OpenAPI spec lists
 every installed content type for such a route. Fixed-width record files come from the
-[waypoint-export-fixed](../Waypoint-Export-Fixed) sub-plugin; other formats can plug in the same way.
+[waypoint-export-fixed](https://github.com/systonia/Waypoint-Export-Fixed) sub-plugin; other formats can plug in the same way.
 
 ## Setup
 

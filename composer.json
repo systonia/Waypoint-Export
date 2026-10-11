@@ -1,11 +1,11 @@
 {
     "name": "systonia/waypoint-export",
-    "description": "CSV exports for Waypoint: return an Export from a route and the browser downloads an Excel-friendly file.",
+    "description": "Table downloads for Waypoint: return a Sheet from a route and get CSV, JSON Lines, HTML, XML, XLSX or ODS, streamed row by row.",
     "type": "library",
     "license": ["MIT", "Apache-2.0"],
     "require": {
         "php": ">=8.5",
-        "systonia/waypoint": "^1.4.1"
+        "systonia/waypoint": "^1.5"
     },
     "require-dev": {
         "phpunit/phpunit": "^13.3",
