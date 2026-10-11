@@ -24,9 +24,8 @@ final class ExportPlugin extends PluginBase implements Renderer, OpenApiExtensio
         return 'export';
     }
 
-    public function boot(Container $container): void
+    public function boot(Container $container, ExportOptions $options): void
     {
-        $options = $container->get(ExportOptions::class);
         $cells = new Cells($options);
         $this->html = new HtmlWriter($cells);
         $this->writers = (new Writers())
