@@ -34,8 +34,7 @@ public string $encoding = 'Windows-1252';
 ### $lineEnding
 
 ```php
-public string $lineEnding = '
-';
+public string $lineEnding = "\r\n";
 ```
 
 "\r\n" is what Excel writes itself.
