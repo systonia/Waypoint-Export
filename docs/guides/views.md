@@ -4,7 +4,7 @@ description: Render a Sheet as an HTML table inside a Waypoint view with $this->
 order: 60
 ---
 
-The plugin adds the view helper `sheet`: in a view or layout, `$this->sheet($sheet)` returns the sheet as a bare HTML `<table>`, the same table the `.html` download contains, without the page around it. One sheet definition then serves the page and the download.
+The plugin adds the view helper `sheet`: in a view or layout, `$this->sheet($sheet)` returns the sheet as a bare HTML `<table>` (a `Waypoint\Html`), the same table the `.html` download contains, without the page around it. One sheet definition then serves the page and the download.
 
 ```php
 #[Get('/admin/report')]
@@ -48,7 +48,7 @@ The output:
 ```
 
 - The format of the sheet does not matter to the helper; `Sheet::file('users.html')` is just the natural name.
-- Labels, the caption and every cell are HTML-escaped by the helper. Waypoint views do not escape `<?= ?>` on their own, and the helper's result is markup, so it is echoed as it is.
+- Labels, the caption and every cell are HTML-escaped by the helper. It returns the table as a `Waypoint\Html`, which `<?= ?>` prints as it is.
 - Cells hold the text representation: `decimalSeparator`, `dateFormat` and `booleans` from [Configuration](configuration.md) apply.
 - The table has no styles of its own. Number cells carry `wp-sheet-num`, header cells `scope="col"`.
 

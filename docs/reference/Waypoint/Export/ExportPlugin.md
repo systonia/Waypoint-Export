@@ -91,7 +91,7 @@ Writes the sheet with the writer for its format, as an attachment with `Cache-Co
 public function helpers(): array
 ```
 
-`sheet`: `$this->sheet($sheet)` in a view returns the sheet as a bare HTML `<table>`.
+`sheet`: `$this->sheet($sheet)` in a view returns the sheet as a bare HTML `<table>`, as Html.
 
 **Returns** `array`
 

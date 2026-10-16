@@ -4,6 +4,7 @@ namespace Waypoint\Export;
 
 use Waypoint\Container;
 use Waypoint\Export\Writers\{CsvWriter, HtmlWriter, JsonLinesWriter, OdsWriter, XlsxWriter, XmlWriter};
+use Waypoint\Html;
 use Waypoint\Http\{Request, Response};
 use Waypoint\Plugin\{OpenApiExtension, PluginBase, Renderer, ViewHelper};
 
@@ -70,10 +71,10 @@ final class ExportPlugin extends PluginBase implements Renderer, OpenApiExtensio
         }
     }
 
-    /** `sheet`: `$this->sheet($sheet)` in a view returns the sheet as a bare HTML `<table>`. */
+    /** `sheet`: `$this->sheet($sheet)` in a view returns the sheet as a bare HTML `<table>`, as Html. */
     public function helpers(): array
     {
-        return ['sheet' => fn(Sheet $sheet): string => implode('', iterator_to_array($this->html->fragment($sheet), false))];
+        return ['sheet' => fn(Sheet $sheet): Html => new Html(implode('', iterator_to_array($this->html->fragment($sheet), false)))];
     }
 
     public function describeParameter(array $parameter): ?array
