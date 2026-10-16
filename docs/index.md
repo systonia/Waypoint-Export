@@ -4,7 +4,7 @@ description: Return a Sheet from a Waypoint route and the browser downloads it a
 order: 1
 ---
 
-Waypoint Export turns a table into a file download. A route returns a `Sheet` — a file name, columns and rows — and the plugin writes it in the format the file's extension names:
+Waypoint Export turns a table into a file download. A route returns a `Sheet` (a file name, columns and rows), and the plugin writes it in the format the file's extension names:
 
 | Extension | Format | Content-Type |
 |---|---|---|
@@ -15,7 +15,7 @@ Waypoint Export turns a table into a file download. A route returns a `Sheet` �
 | `.xlsx` | an Office Open XML workbook | `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` |
 | `.ods` | an OpenDocument spreadsheet | `application/vnd.oasis.opendocument.spreadsheet` |
 
-All six are written by the package itself, without external libraries; XLSX and ODS use PHP's `zip` extension. The same sheet also renders as an HTML table inside a view, and other plugins can add formats — [waypoint-export-fixed](https://github.com/systonia/Waypoint-Export-Fixed) adds fixed-width record files this way.
+All six are written by the package itself, without external libraries; XLSX and ODS use PHP's `zip` extension. The same sheet also renders as an HTML table inside a view, and other plugins can add formats: [waypoint-export-fixed](https://github.com/systonia/Waypoint-Export-Fixed) adds fixed-width record files this way.
 
 ## Install
 

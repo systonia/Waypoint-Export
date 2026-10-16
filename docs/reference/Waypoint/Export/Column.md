@@ -61,6 +61,6 @@ public function __construct(
 
 **Parameters**
 
-- `$label` `string` — Header text in CSV, HTML, XLSX and ODS.
-- `$name` `string|null` — JSON key / XML element name; default: the property name.
-- `$type` [`CellType`](CellType.md)`|null` — Declared type for the generated XSD; default: typed per value.
+- `$label` `string`: Header text in CSV, HTML, XLSX and ODS.
+- `$name` `string|null`: JSON key / XML element name; default: the property name.
+- `$type` [`CellType`](CellType.md)`|null`: Declared type for the generated XSD; default: typed per value.

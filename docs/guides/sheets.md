@@ -56,7 +56,7 @@ Sheet::file('users.csv')
 
 Calls can be mixed; the columns appear in the order they were added. A closure is the place for anything derived: a formatted name, a value from a related object, a conversion from a database string.
 
-The value a column produces decides how it is written: an `int` or `float` becomes a number, a `bool` a boolean, a `DateTimeInterface` a date, a backed enum its value, `null` an empty cell, and a string stays text — also `'007'` or `'0049 30'`, which keep their leading zeros. [Formats and cell types](formats.md) shows each format's representation.
+The value a column produces decides how it is written: an `int` or `float` becomes a number, a `bool` a boolean, a `DateTimeInterface` a date, a backed enum its value, `null` an empty cell, and a string stays text, also `'007'` or `'0049 30'`, which keep their leading zeros. [Formats and cell types](formats.md) shows each format's representation.
 
 ## Rows
 

@@ -67,7 +67,7 @@ The layout includes it with `<?= $this->assetTags() ?>`, and the element that sh
 
 ## Large tables
 
-The helper builds the whole table as one string before the view continues. For a page, keep the rows to what a person reads — the latest hundred orders — and link the download for the rest:
+The helper builds the whole table as one string before the view continues. For a page, keep the rows to what a person reads (the latest hundred orders) and link the download for the rest:
 
 ```php
 return new View('Orders', [

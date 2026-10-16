@@ -36,14 +36,14 @@ A sheet that downloads as $filename.
 
 **Parameters**
 
-- `$filename` `string` — The download's file name without a path: no `/`, `\`, `:`, `*`, `?`, `"`, `<`, `>`, `|` or control characters.
-- `$format` `string|null` — Writer name; default: the file's extension, lowercased (`users.xlsx` -> xlsx).
+- `$filename` `string`: The download's file name without a path: no `/`, `\`, `:`, `*`, `?`, `"`, `<`, `>`, `|` or control characters.
+- `$format` `string|null`: Writer name; default: the file's extension, lowercased (`users.xlsx` -> xlsx).
 
 **Returns** [`Sheet`](Sheet.md)
 
 **Throws**
 
-- [`InvalidArgumentException`](https://www.php.net/manual/en/class.invalidargumentexception.php) — when the file name is not plain, or the format (or extension) is not lowercase letters and digits
+- [`InvalidArgumentException`](https://www.php.net/manual/en/class.invalidargumentexception.php): when the file name is not plain, or the format (or extension) is not lowercase letters and digits
 
 ### csv()
 
@@ -61,7 +61,7 @@ A sheet written as CSV whatever the file's extension.
 
 **Throws**
 
-- [`InvalidArgumentException`](https://www.php.net/manual/en/class.invalidargumentexception.php) — when the file name is not plain
+- [`InvalidArgumentException`](https://www.php.net/manual/en/class.invalidargumentexception.php): when the file name is not plain
 
 ### title()
 
@@ -104,7 +104,7 @@ Adds a column per entry, each reading the row's key or property of the same name
 
 **Parameters**
 
-- `$columns` `array<string, string>` — key => header label, in output order.
+- `$columns` `array<string, string>`: key => header label, in output order.
 
 **Returns** [`Sheet`](Sheet.md)
 
@@ -124,11 +124,11 @@ Adds one column after the ones already defined.
 
 **Parameters**
 
-- `$key` `string` — The row's array key or public property to read.
-- `$label` `string` — Header text in CSV, HTML, XLSX and ODS.
-- `$value` `(`[`Closure`](https://www.php.net/manual/en/class.closure.php)`(mixed): mixed)|null` — Computes the cell from the row; null reads the row's key/property.
-- `$name` `string|null` — JSON key / XML element name; default $key.
-- `$type` [`CellType`](CellType.md)`|null` — Declared type for the generated XSD; null types each value as it comes.
+- `$key` `string`: The row's array key or public property to read.
+- `$label` `string`: Header text in CSV, HTML, XLSX and ODS.
+- `$value` `(`[`Closure`](https://www.php.net/manual/en/class.closure.php)`(mixed): mixed)|null`: Computes the cell from the row; null reads the row's key/property.
+- `$name` `string|null`: JSON key / XML element name; default $key.
+- `$type` [`CellType`](CellType.md)`|null`: Declared type for the generated XSD; null types each value as it comes.
 
 **Returns** [`Sheet`](Sheet.md)
 
@@ -148,7 +148,7 @@ Attaches a writer-specific attribute object (e.g. #[Fixed]) to the column added 
 
 **Throws**
 
-- [`InvalidArgumentException`](https://www.php.net/manual/en/class.invalidargumentexception.php) — when no column has been added yet
+- [`InvalidArgumentException`](https://www.php.net/manual/en/class.invalidargumentexception.php): when no column has been added yet
 
 ### columnsOf()
 
@@ -175,7 +175,7 @@ The rows to write, iterated when the file is written.
 
 **Parameters**
 
-- `$rows` `iterable<mixed>` — Arrays or objects; a generator streams without holding every row.
+- `$rows` `iterable<mixed>`: Arrays or objects; a generator streams without holding every row.
 
 **Returns** [`Sheet`](Sheet.md)
 

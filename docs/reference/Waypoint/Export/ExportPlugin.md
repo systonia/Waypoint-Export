@@ -51,7 +51,7 @@ Creates Cells and the built-in writers from $options and puts Cells and Writers 
 public function hooks(): array
 ```
 
-**Returns** `list<object>` — Instances of Endpoint, Fallback, RouteAttributeCompiler, Guard, ResponseHook, ArgumentBinder, Renderer, OpenApiExtension, ViewHelper, ClientAsset.
+**Returns** `list<object>`: Instances of Endpoint, Fallback, RouteAttributeCompiler, Guard, ResponseHook, ArgumentBinder, Renderer, OpenApiExtension, ViewHelper, ClientAsset.
 
 ### supports()
 
@@ -83,7 +83,7 @@ Writes the sheet with the writer for its format, as an attachment with `Cache-Co
 
 **Throws**
 
-- [`RuntimeException`](https://www.php.net/manual/en/class.runtimeexception.php) — when no writer is installed for the sheet's format
+- [`RuntimeException`](https://www.php.net/manual/en/class.runtimeexception.php): when no writer is installed for the sheet's format
 
 ### helpers()
 
@@ -103,9 +103,9 @@ public function describeParameter(array $parameter): ?array
 
 **Parameters**
 
-- `$parameter` `array{name: string, type: string|null, nullable: bool, hasDefault: bool, attributes: list<array{name: string, args: array<int|string, mixed>}>}` — The cached metadata of one controller parameter: PHP name, named type, and its attributes as {name, args}.
+- `$parameter` `array{name: string, type: string|null, nullable: bool, hasDefault: bool, attributes: list<array{name: string, args: array<int|string, mixed>}>}`: The cached metadata of one controller parameter: PHP name, named type, and its attributes as {name, args}.
 
-**Returns** `array{parameters?: list<array<string, mixed>>, requestBody?: array<string, mixed>}|null` — OpenAPI parameter objects and/or a requestBody object for it, null when the plugin doesn't bind it.
+**Returns** `array{parameters?: list<array<string, mixed>>, requestBody?: array<string, mixed>}|null`: OpenAPI parameter objects and/or a requestBody object for it, null when the plugin doesn't bind it.
 
 ### describeResult()
 

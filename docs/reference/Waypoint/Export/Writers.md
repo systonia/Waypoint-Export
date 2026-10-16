@@ -45,7 +45,7 @@ The writer for $format, case-insensitively.
 
 **Throws**
 
-- [`RuntimeException`](https://www.php.net/manual/en/class.runtimeexception.php) — naming the installed formats when none matches
+- [`RuntimeException`](https://www.php.net/manual/en/class.runtimeexception.php): naming the installed formats when none matches
 
 ### has()
 
@@ -67,4 +67,4 @@ Whether a writer for $format is installed, case-insensitively.
 public function all(): array
 ```
 
-**Returns** `array<string, `[`Writer`](Writer.md)`>` — extension => writer
+**Returns** `array<string, `[`Writer`](Writer.md)`>`: extension => writer

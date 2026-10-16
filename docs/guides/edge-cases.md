@@ -73,4 +73,4 @@ CSV in Windows-1252 cannot hold every character: `€`, `ß` and the umlauts are
 
 ## Rows are read once
 
-`rows()` keeps the iterable as it is and each write iterates it. An array can be written any number of times; a generator only once — writing the same sheet twice throws `Cannot traverse an already closed generator`. Build a new sheet per response, as a route does anyway.
+`rows()` keeps the iterable as it is and each write iterates it. An array can be written any number of times; a generator only once. Writing the same sheet twice throws `Cannot traverse an already closed generator`. Build a new sheet per response, as a route does anyway.

@@ -57,7 +57,7 @@ The Content-Type header of the download, with a charset for text formats.
 public function stream(\Waypoint\Export\Sheet $sheet): iterable
 ```
 
-The file, chunk by chunk -- a generator, so a large export never sits in memory twice.
+The file, chunk by chunk: a generator, so a large export never sits in memory twice.
 
 **Parameters**
 

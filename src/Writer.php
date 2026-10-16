@@ -12,7 +12,7 @@ interface Writer
     public function contentType(): string;
 
     /**
-     * The file, chunk by chunk -- a generator, so a large export never sits in memory twice.
+     * The file, chunk by chunk: a generator, so a large export never sits in memory twice.
      * @return iterable<string>
      */
     public function stream(Sheet $sheet): iterable;

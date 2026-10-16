@@ -89,7 +89,7 @@ See [XML with a schema](xml-schema.md) for what validation checks.
 
 ## Per export
 
-The options are app-wide. What differs per export is set on the sheet: the format (`Sheet::file('x.dat', 'csv')`), the title, the column names and types, and the XML schema. The cell values are yours to shape in a column closure — a date formatted as a string in the closure is written as that text:
+The options are app-wide. What differs per export is set on the sheet: the format (`Sheet::file('x.dat', 'csv')`), the title, the column names and types, and the XML schema. The cell values are yours to shape in a column closure: a date formatted as a string in the closure is written as that text:
 
 ```php
 ->column('day', 'Day', fn(Order $o): string => $o->placed->format('Y-m-d'))

@@ -13,7 +13,7 @@ Every value is typed once, then each writer picks its own representation. [`Cell
 | `int`, `float` | `Number` |
 | `DateTimeInterface` | `Date` |
 | backed enum | typed by its value (`Status::Active` → `'active'`, Text) |
-| `string`, `Stringable` | `Text` — numeric strings such as `'007'` stay text |
+| `string`, `Stringable` | `Text`; numeric strings such as `'007'` stay text |
 | array, other object | `Text` holding its JSON (`["a",1]`) |
 
 What the writers make of them:
@@ -103,6 +103,6 @@ Content-Disposition: attachment; filename="users.xlsx"; filename*=UTF-8''users.x
 Cache-Control: no-store
 ```
 
-`no-store` keeps exported data out of shared caches. A route that returns `Sheet` is listed in the OpenAPI spec with one response content type per installed writer — the six above plus any a [format plugin](custom-formats.md) adds.
+`no-store` keeps exported data out of shared caches. A route that returns `Sheet` is listed in the OpenAPI spec with one response content type per installed writer: the six above plus any a [format plugin](custom-formats.md) adds.
 
 See also: [Configuration](configuration.md), [`Cells`](../reference/Waypoint/Export/Cells.md), [the writer classes](../reference/Waypoint/Export/Writers/index.md).
