@@ -14,6 +14,7 @@ final class ZipPackage
     /** @var list<string> temp files to delete after streaming */
     private array $temps = [];
 
+    /** Opens a new archive in a temp file. */
     public function __construct()
     {
         $this->path = self::temp();
@@ -23,6 +24,7 @@ final class ZipPackage
         }
     }
 
+    /** Adds an entry from a string; $store keeps it uncompressed (ODS needs that for `mimetype`). */
     public function addString(string $name, string $content, bool $store = false): self
     {
         $this->zip->addFromString($name, $content);

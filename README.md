@@ -6,6 +6,8 @@ XLSX or ODS, all written without external libraries and streamed row by row. The
 every installed content type for such a route. Fixed-width record files come from the
 [waypoint-export-fixed](https://github.com/systonia/Waypoint-Export-Fixed) sub-plugin; other formats can plug in the same way.
 
+Documentation: [guides and reference](docs/index.md), starting with [building a sheet](docs/guides/sheets.md).
+
 ## Setup
 
 ```php

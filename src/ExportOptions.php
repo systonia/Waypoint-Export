@@ -20,7 +20,10 @@ class ExportOptions
      */
     public array $booleans = ['1', '0'];
 
+    /** Settings of the CSV writer. */
     public CsvOptions $csv;
+
+    /** Settings of the XML writer. */
     public XmlOptions $xml;
 
     public function __construct()

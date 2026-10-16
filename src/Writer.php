@@ -8,6 +8,7 @@ interface Writer
     /** The file extension the writer answers to; `Sheet::file('x.<extension>')` selects it. */
     public function extension(): string;
 
+    /** The Content-Type header of the download, with a charset for text formats. */
     public function contentType(): string;
 
     /**

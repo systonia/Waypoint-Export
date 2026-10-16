@@ -8,6 +8,7 @@ use Waypoint\Export\{Cell, Cells, CellType, Sheet, Writer};
 /** A minimal OpenDocument spreadsheet: stored mimetype first, manifest, one table in content.xml with typed cells. */
 final class OdsWriter implements Writer
 {
+    /** The ODS media type: the Content-Type and the content of the `mimetype` entry. */
     public const MIME = 'application/vnd.oasis.opendocument.spreadsheet';
 
     public function __construct(private readonly Cells $cells)

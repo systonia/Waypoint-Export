@@ -12,6 +12,7 @@ use Stringable;
  */
 final class Cells
 {
+    /** text() takes the decimal separator, date format and boolean words from $options. */
     public function __construct(private readonly ExportOptions $options)
     {
     }
@@ -42,6 +43,10 @@ final class Cells
         return null;
     }
 
+    /**
+     * Types one value: null is Empty, bool Bool, int and float Number, a DateTimeInterface Date,
+     * a backed enum its value, a string or Stringable Text, anything else Text holding its JSON.
+     */
     public function cell(mixed $value): Cell
     {
         return match (true) {

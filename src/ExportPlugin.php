@@ -24,6 +24,7 @@ final class ExportPlugin extends PluginBase implements Renderer, OpenApiExtensio
         return 'export';
     }
 
+    /** Creates Cells and the built-in writers from $options and puts Cells and Writers into the container. */
     public function boot(Container $container, ExportOptions $options): void
     {
         $cells = new Cells($options);
@@ -44,11 +45,17 @@ final class ExportPlugin extends PluginBase implements Renderer, OpenApiExtensio
         return [$this];
     }
 
+    /** True for a Sheet. */
     public function supports(mixed $result): bool
     {
         return $result instanceof Sheet;
     }
 
+    /**
+     * Writes the sheet with the writer for its format, as an attachment with `Cache-Control: no-store`.
+     *
+     * @throws \RuntimeException when no writer is installed for the sheet's format
+     */
     public function render(mixed $result, Request $req, Response $res): void
     {
         if (!$result instanceof Sheet) {
@@ -63,6 +70,7 @@ final class ExportPlugin extends PluginBase implements Renderer, OpenApiExtensio
         }
     }
 
+    /** `sheet`: `$this->sheet($sheet)` in a view returns the sheet as a bare HTML `<table>`. */
     public function helpers(): array
     {
         return ['sheet' => fn(Sheet $sheet): string => implode('', iterator_to_array($this->html->fragment($sheet), false))];
@@ -73,6 +81,7 @@ final class ExportPlugin extends PluginBase implements Renderer, OpenApiExtensio
         return null;
     }
 
+    /** For a Sheet return type: one content entry per installed writer's media type. */
     public function describeResult(string $returnType): ?array
     {
         if ($returnType !== Sheet::class) {

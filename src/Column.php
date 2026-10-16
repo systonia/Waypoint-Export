@@ -12,6 +12,11 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class Column
 {
+    /**
+     * @param string $label Header text in CSV, HTML, XLSX and ODS.
+     * @param string|null $name JSON key / XML element name; default: the property name.
+     * @param CellType|null $type Declared type for the generated XSD; default: typed per value.
+     */
     public function __construct(public string $label, public ?string $name = null, public ?CellType $type = null)
     {
     }
