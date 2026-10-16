@@ -2,3 +2,6 @@ parameters:
     level: 10
     paths:
         - src
+        # typed closures for Sheet::column()
+        - tests/SheetTest.php
+        - tests/Support.php

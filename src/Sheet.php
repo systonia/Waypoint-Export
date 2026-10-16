@@ -103,7 +103,7 @@ final class Sheet
      *
      * @param string $key The row's array key or public property to read.
      * @param string $label Header text in CSV, HTML, XLSX and ODS.
-     * @param (Closure(mixed): mixed)|null $value Computes the cell from the row; null reads the row's key/property.
+     * @param (Closure(never): mixed)|null $value Computes the cell from the row, typed for the rows it gets; null reads the row's key/property.
      * @param string|null $name JSON key / XML element name; default $key.
      * @param CellType|null $type Declared type for the generated XSD; null types each value as it comes.
      */

@@ -126,7 +126,7 @@ Adds one column after the ones already defined.
 
 - `$key` `string`: The row's array key or public property to read.
 - `$label` `string`: Header text in CSV, HTML, XLSX and ODS.
-- `$value` `(`[`Closure`](https://www.php.net/manual/en/class.closure.php)`(mixed): mixed)|null`: Computes the cell from the row; null reads the row's key/property.
+- `$value` `(`[`Closure`](https://www.php.net/manual/en/class.closure.php)`(never): mixed)|null`: Computes the cell from the row, typed for the rows it gets; null reads the row's key/property.
 - `$name` `string|null`: JSON key / XML element name; default $key.
 - `$type` [`CellType`](CellType.md)`|null`: Declared type for the generated XSD; null types each value as it comes.
 

@@ -32,7 +32,7 @@ final class SheetTest extends TestCase
     public function testColumnsCarryNameTypeClosureAndMeta(): void
     {
         $meta = new Column('unused');
-        $sheet = Sheet::file('a.csv')->columns(['a' => 'A'])->column('b', 'B', fn(mixed $r): int => 1, name: 'bee', type: CellType::Number)->meta($meta)->rows([['a' => 1]]);
+        $sheet = Sheet::file('a.csv')->columns(['a' => 'A'])->column('b', 'B', fn(Row $r): int => 1, name: 'bee', type: CellType::Number)->meta($meta)->rows([['a' => 1]]);
 
         $columns = $sheet->getColumns();
         $this->assertSame(['a', 'A', 'a', null, null, []], [$columns[0]['key'], $columns[0]['label'], $columns[0]['name'], $columns[0]['type'], $columns[0]['value'], $columns[0]['meta']]);
