@@ -2,7 +2,7 @@
 
 Table downloads for [Waypoint](https://github.com/Systonia/Waypoint). Return a `Sheet` from a route
 and the browser gets a file in the format its extension names: CSV, JSON Lines, HTML, XML with schema,
-XLSX or ODS, all written without external libraries and streamed row by row. The OpenAPI spec lists
+XLSX or ODS, all written row by row without external libraries. The OpenAPI spec lists
 every installed content type for such a route. Fixed-width record files come from the
 [waypoint-export-fixed](https://github.com/systonia/Waypoint-Export-Fixed) sub-plugin; other formats can plug in the same way.
 
@@ -35,8 +35,9 @@ public function exportUsers(): Sheet
   `Sheet::file('x.dat', format: 'fixed')` names it explicitly. An unknown format fails with the list of
   installed ones.
 - **Rows** are arrays or objects; a column reads the key or public property of the same name, or the
-  closure you give it. `rows()` accepts any iterable, so a generator over a PDO cursor streams without
-  holding the table in memory (XLSX and ODS spool to a temp file, then stream the zip).
+  closure you give it. `rows()` accepts any iterable, so a generator over a PDO cursor is read one row
+  at a time (XLSX and ODS spool to a temp file, then zip it). The finished file is collected in the
+  response body and held in memory once before it is sent; see [memory](docs/guides/edge-cases.md#memory).
 - **Row classes:** `columnsOf(RowClass::class)` collects `#[Column('Label', name: 'jsonKey', type: CellType::Number)]`
   properties in declaration order; other attributes on such a property become column meta for writers
   like `#[Fixed]`.
@@ -90,8 +91,16 @@ leaves; for dev and CI.
 ## Adding a format from another plugin
 
 Implement `Waypoint\Export\Writer` (`extension()`, `contentType()`, `stream(Sheet): iterable<string>`),
-declare `requires(): [ExportPlugin::class]`, and in `boot()` call `$container->get(Writers::class)->add($writer)`.
-`Cells` from the container types the values for you. `waypoint-export-fixed` is the reference.
+declare `requires(): [ExportPlugin::class]`, and take `Cells` and `Writers` as `boot()` parameters:
+
+```php
+public function boot(Cells $cells, Writers $writers): void
+{
+    $writers->add(new MarkdownWriter($cells));   // Cells types the values for the writer
+}
+```
+
+[Adding a format](docs/guides/custom-formats.md) walks through it; `waypoint-export-fixed` is the reference.
 
 ## Development
 

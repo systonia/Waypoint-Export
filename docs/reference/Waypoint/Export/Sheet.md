@@ -175,7 +175,7 @@ The rows to write, iterated when the file is written.
 
 **Parameters**
 
-- `$rows` `iterable<mixed>`: Arrays or objects; a generator streams without holding every row.
+- `$rows` `iterable<mixed>`: Arrays or objects; a generator is read one row at a time, never held as a whole.
 
 **Returns** [`Sheet`](Sheet.md)
 

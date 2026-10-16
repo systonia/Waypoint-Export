@@ -152,7 +152,7 @@ final class Sheet
     /**
      * The rows to write, iterated when the file is written.
      *
-     * @param iterable<mixed> $rows Arrays or objects; a generator streams without holding every row.
+     * @param iterable<mixed> $rows Arrays or objects; a generator is read one row at a time, never held as a whole.
      */
     public function rows(iterable $rows): self
     {
