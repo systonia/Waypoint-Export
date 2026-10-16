@@ -1,6 +1,6 @@
 ---
 title: Row classes
-description: Declare the columns once with #[Column] on a class and reuse them with columnsOf().
+description: "Declare the columns once with #[Column] on a class and reuse them with columnsOf()."
 order: 20
 ---
 
