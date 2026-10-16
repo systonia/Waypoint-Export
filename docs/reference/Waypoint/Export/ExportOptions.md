@@ -1,6 +1,6 @@
 ---
 title: "ExportOptions"
-description: "Configure with `$app->configure(function (ExportOptions $opts) { ..."
+description: "Configure with `$app->configure(function (ExportOptions $opts) { ... })`."
 order: 100
 generated: true
 ---
