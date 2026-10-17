@@ -1,1 +1,1 @@
-<div><?= $this->sheet($model["sheet"]) ?></div>
+<div>{{ $this->sheet($model["sheet"]) }}</div>
