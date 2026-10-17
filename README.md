@@ -16,26 +16,33 @@ $app->plugin(new Waypoint\Export\ExportPlugin());   // before attach()
 
 ## Usage
 
+The orders export of the Sonnenkorn bakery, shortened from
+[`BackofficeController`](https://github.com/systonia/Waypoint-Bakery/blob/main/src/Controllers/BackofficeController.php):
+
 ```php
 use Waypoint\Export\Sheet;
 
-#[Get('/admin/users.xlsx')]
-#[Role('admin')]
-public function exportUsers(): Sheet
+#[Get('/orders.{format}')]
+#[Role('owner')]
+public function export(string $format): Sheet
 {
-    return Sheet::file('users.xlsx')
-        ->title('Users')
-        ->columns(['id' => 'ID', 'email' => 'Email', 'role' => 'Role'])
-        ->column('name', 'Name', fn(User $u): ?string => $u->displayHandle())
-        ->rows($this->users->all());
+    if (!in_array($format, ['csv', 'xlsx'], true)) {
+        throw new NotFoundException("No export as $format");
+    }
+    $total = fn (Order $o) => $o->totalCents() / 100;
+    return Sheet::file("orders.$format")
+        ->title('Orders')
+        ->columns(['code' => 'Order', 'customerName' => 'Customer', 'email' => 'Email'])
+        ->column('total', 'Total (€)', $total)
+        ->rows($this->orders->recent(90));
 }
 ```
 
-- **Format** comes from the extension (`users.csv`, `.jsonl`, `.html`, `.xml`, `.xlsx`, `.ods`);
-  `Sheet::file('x.dat', format: 'fixed')` names it explicitly. An unknown format fails with the list of
+- **Format** comes from the extension (`orders.csv`, `.jsonl`, `.html`, `.xml`, `.xlsx`, `.ods`);
+  `Sheet::file('till.dat', format: 'fixed')` names it explicitly. An unknown format fails with the list of
   installed ones.
 - **Rows** are arrays or objects; a column reads the key or public property of the same name, or the
-  closure you give it. `rows()` accepts any iterable, so a generator over a PDO cursor is read one row
+  closure you give it. `rows()` accepts any iterable, so a generator that pages through a table is read one row
   at a time (XLSX and ODS spool to a temp file, then zip it). The finished file is collected in the
   response body and held in memory once before it is sent; see [memory](docs/guides/edge-cases.md#memory).
 - **Row classes:** `columnsOf(RowClass::class)` collects `#[Column('Label', name: 'jsonKey', type: CellType::Number)]`
@@ -64,10 +71,10 @@ needs no guard.
 ### XML with schema
 
 ```php
-Sheet::file('users.xml')->title('users')->schema('urn:example:users', 'users.xsd')->columnsOf(UserRow::class)->rows($rows);
+Sheet::file('sales.xml')->title('sales')->schema('urn:sonnenkorn:sales', 'sales.xsd')->columnsOf(SalesRow::class)->rows($rows);
 ```
 
-Writes `<users xmlns="urn:example:users" xsi:schemaLocation="urn:example:users users.xsd"><row>…</row></users>`.
+Writes `<sales xmlns="urn:sonnenkorn:sales" xsi:schemaLocation="urn:sonnenkorn:sales sales.xsd"><row>…</row></sales>`.
 `XmlWriter::xsd($sheet)` derives the matching schema from the columns (declared `type`s, else `xs:string`)
 so you can serve it next to the data. With `ExportOptions::$xml->validate = true` every document is
 checked against the XSD (`schema(..., xsd: '/path/to/given.xsd')` for one you were handed) before it

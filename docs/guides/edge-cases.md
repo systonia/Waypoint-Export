@@ -12,31 +12,37 @@ order: 90
 - a name without an extension and without a format (`'README'`),
 - a format that is not lowercase letters and digits (`Sheet::file('report', 'CSV')`).
 
-Spaces and non-ASCII letters are fine: `Sheet::file('Bericht März 2026.xlsx')` is sent as `filename="Bericht März 2026.xlsx"; filename*=UTF-8''Bericht%20M%C3%A4rz%202026.xlsx`, and browsers use the encoded form. An extension with more dots counts only the last part: `a.tar.gz` asks for the format `gz`.
+Spaces and non-ASCII letters are fine: `Sheet::file('Umsätze März 2026.xlsx')` is sent as `filename="Umsätze März 2026.xlsx"; filename*=UTF-8''Ums%C3%A4tze%20M%C3%A4rz%202026.xlsx`, and browsers use the encoded form. An extension with more dots counts only the last part: `a.tar.gz` asks for the format `gz`.
 
 ## Unknown formats
 
 A sheet whose format no writer handles fails when the route's result is rendered: `Writers::for()` throws a `RuntimeException` like `No export writer for 'pdf'; installed: csv, jsonl, html, xml, xlsx, ods.`. Waypoint logs it and answers 500 with a generic problem body.
 
-When the format comes from the URL, a missing writer is the client's mistake. Ask the registry and answer 404:
+When the format comes from the URL, a missing writer is the client's mistake. The bakery's back office lists the formats it allows (`in_array($format, ['csv', 'xlsx'], true)`, see [Building a sheet](sheets.md#file-name-and-format)); to allow every installed one, ask the registry and answer 404:
 
 ```php
 use Waypoint\Exceptions\NotFoundException;
 use Waypoint\Export\{Sheet, Writers};
 
-#[Controller('/reports')]
-final class ReportsController
+#[Controller('/backoffice')]
+#[Authenticated]
+final class StockExportController
 {
     #[Inject]
     private Writers $writers;
 
-    #[Get('/costs.{format}')]
-    public function costs(string $format): Sheet
+    #[Inject]
+    private Products $products;
+
+    #[Get('/stock.{format}')]
+    public function stock(string $format): Sheet
     {
         if (!$this->writers->has($format)) {
             throw new NotFoundException("No export as .$format");
         }
-        return Sheet::file("costs.$format")->columns(['item' => 'Item'])->rows($this->costs->all());
+        return Sheet::file("stock.$format")
+            ->columns(['slug' => 'Product', 'stock' => 'In stock'])
+            ->rows($this->products->all());
     }
 }
 ```
@@ -61,7 +67,7 @@ CSV in Windows-1252 cannot hold every character: `€`, `ß` and the umlauts are
 
 ## Numbers and text
 
-- A numeric string stays text: `'007'` keeps its zeros in every format, and XLSX stores it as text. Convert in a closure (`fn($r) => (int) $r['qty']`) when a database returns numbers as strings and the spreadsheet should calculate with them.
+- A numeric string stays text: `'007'` keeps its zeros in every format, and XLSX stores it as text. Convert in a closure (`fn (array $r) => (int) $r['quantity']`) when a database returns numbers as strings and the spreadsheet should calculate with them.
 - Floats are written with at most six decimals (except in JSON Lines). For money, pass the amount as it should appear, for instance rounded to two decimals.
 - A backed enum is written as its value; a pure enum has no value and no JSON form, so it comes out as empty text; give such a column a closure returning `$case->name`.
 - Arrays and objects without `__toString()` become their JSON.

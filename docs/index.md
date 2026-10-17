@@ -23,65 +23,102 @@ All six are written by the package itself, without external libraries; XLSX and 
 composer require systonia/waypoint-export
 ```
 
-The package needs PHP 8.5 and `systonia/waypoint` 0.6.4 or later. Register the plugin before `attach()`:
+The package needs PHP 8.5 and `systonia/waypoint` 0.6.4 or later. Register the plugin before `attach()`, as the Sonnenkorn bakery does in its [`app.php`](https://github.com/systonia/Waypoint-Bakery/blob/main/app.php):
 
 ```php
-use Waypoint\Export\ExportPlugin;
+use Waypoint\Export\{ExportOptions, ExportPlugin};
 use Waypoint\Waypoint;
 
 $app = Waypoint::create();
 $app->plugin(new ExportPlugin());
-$app->attach([ExportController::class]);
+$app->configure(function (ExportOptions $export) {
+    $export->csv->encoding = 'UTF-8';
+});
+$app->attach([BackofficeController::class]);
 $app->serve();
 ```
 
 ## A first export
 
+The bakery's owner downloads the orders of the last 90 days from the back office. Shortened from `src/Controllers/BackofficeController.php`:
+
 ```php
 <?php
 
-use Waypoint\Attributes\{Controller, Get, Inject};
-use Waypoint\Export\Sheet;
+namespace Bakery\Controllers;
 
-#[Controller('/admin')]
-final class ExportController
+use Bakery\Models\{Order, OrderLine};
+use Bakery\Repositories\Orders;
+use DateTimeImmutable;
+use Waypoint\Attributes\{Authenticated, Controller, Get, Ignore, Inject, Role};
+use Waypoint\Exceptions\NotFoundException;
+use Waypoint\Export\Sheet;
+use Waypoint\I18n\Translator;
+
+#[Controller('/backoffice')]
+#[Ignore]
+#[Authenticated]
+final class BackofficeController
 {
     #[Inject]
-    private UserRepository $users;
+    private Orders $orders;
 
-    #[Get('/users.{format}')]
-    public function users(string $format): Sheet
+    #[Inject]
+    private Translator $translator;
+
+    /** The last 90 days of orders as orders.csv or orders.xlsx. */
+    #[Get('/orders.{format}')]
+    #[Role('owner')]
+    public function export(string $format): Sheet
     {
-        return Sheet::file("users.$format")
-            ->title('Users')
-            ->columns(['id' => 'ID', 'email' => 'Email'])
-            ->column('name', 'Name', fn(User $u): string => $u->fullName())
-            ->columns(['balance' => 'Balance', 'newsletter' => 'Newsletter', 'registered' => 'Registered'])
-            ->rows($this->users->all());
+        if (!in_array($format, ['csv', 'xlsx'], true)) {
+            throw new NotFoundException("No export as $format");
+        }
+        return $this->sheet("orders.$format", $this->orders->recent(90));
+    }
+
+    /** @param list<Order> $orders */
+    private function sheet(string $file, array $orders): Sheet
+    {
+        $placed = fn (Order $o) => new DateTimeImmutable($o->createdAt);
+        $customer = fn (Order $o) => $o->customerName;
+        $status = fn (Order $o) => $o->status->label($this->translator);
+        $items = fn (Order $o) => implode(', ', array_map(fn (OrderLine $l) => "$l->quantity × $l->name", $o->lines));
+        $total = fn (Order $o) => $o->totalCents() / 100;
+        return Sheet::file($file)
+            ->title('Orders')
+            ->column('code', 'Order')
+            ->column('created', 'Placed', $placed)
+            ->column('customer', 'Customer', $customer)
+            ->column('email', 'Email')
+            ->column('status', 'Status', $status)
+            ->column('items', 'Items', $items)
+            ->column('total', 'Total (€)', $total)
+            ->rows($orders);
     }
 }
 ```
 
-`GET /admin/users.csv` answers with
+`GET /backoffice/orders.csv` answers with
 
 ```http
 HTTP/1.1 200 OK
-Content-Type: text/csv; charset=windows-1252
-Content-Disposition: attachment; filename="users.csv"; filename*=UTF-8''users.csv
+Content-Type: text/csv; charset=utf-8
+Content-Disposition: attachment; filename="orders.csv"; filename*=UTF-8''orders.csv
 Cache-Control: no-store
 ```
 
-and this file (Windows-1252, `\r\n` line endings):
+and this file (UTF-8 with a byte order mark, `\r\n` line endings):
 
 ```text
-ID;Email;Name;Balance;Newsletter;Registered
-1;ada@example.com;Ada Lovelace;1234,5;1;01.03.2026 09:15
-2;grace@example.com;Grace Hopper;-20;0;17.05.2026 14:00
+Order;Placed;Customer;Email;Status;Items;Total (€)
+3f9a1c07be;16.10.2026 18:42;Lena;lena@example.test;Received;2 × Spelt rolls (4), 1 × Butter croissant;8,6
+81d2e4a90c;16.10.2026 20:05;Paul;paul@example.test;Not confirmed yet;1 × Sourdough loaf;5,2
 ```
 
-`/admin/users.xlsx` is the same table as a workbook with real numbers, booleans and dates, `/admin/users.jsonl` has one JSON object per user, and `/admin/users.pdf` fails, because no writer for `pdf` is installed.
+`/backoffice/orders.xlsx` is the same table as a workbook with real numbers and dates. The route lets only `csv` and `xlsx` through and answers 404 for anything else; without that check, `/backoffice/orders.jsonl` would download as JSON Lines, and `/backoffice/orders.pdf` would fail, because no writer for `pdf` is installed.
 
-Each row here is a `User` object: a column reads the public property of its key (`$user->email`), or calls its closure (`fn(User $u) => $u->fullName()`). Rows can also be arrays, and `rows()` takes any iterable, so a generator over a database cursor works as well.
+The bakery passes every label through `$this->translator->t()` as well, so a German owner gets German headings; the status column does it here with `OrderStatus::label()`. Each row is an `Order` object: a column reads the public property of its key (`$order->code`, `$order->email`), or calls its closure (`$o->totalCents() / 100`). Rows can also be arrays, and `rows()` takes any iterable, so a generator that pages through a table works as well. `#[Ignore]` keeps the back office out of the app's OpenAPI document; [Formats and cell types](guides/formats.md#the-response) shows what an export route contributes to it.
 
 ## How these docs are organised
 

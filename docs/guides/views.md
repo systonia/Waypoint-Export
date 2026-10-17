@@ -6,55 +6,64 @@ order: 60
 
 The plugin adds the view helper `sheet`: in a view or layout, `$this->sheet($sheet)` returns the sheet as a bare HTML `<table>` (a `Waypoint\Html`), the same table the `.html` download contains, without the page around it. One sheet definition then serves the page and the download.
 
+The Sonnenkorn bakery's sales page shows the orders of the last seven days and links the download of the last 90; both come from the same `sheet()` helper of `BackofficeController` (shortened; the helper is in [Building a sheet](sheets.md#columns)):
+
 ```php
-#[Get('/admin/report')]
-public function report(): View
+#[Get('/sales')]
+#[Role('owner')]
+public function sales(): View
 {
-    return new View('Report', ['users' => $this->usersSheet('html')]);
+    // ... the charts
+    return new View('Backoffice/Sales', new SalesPage(
+        revenue: $revenue,
+        products: $products,
+        latest: $this->sheet('orders.html', $this->orders->recent(7)),
+    ), layout: '_Backoffice.php');
 }
 
-#[Get('/admin/users.{format}')]
-public function users(string $format): Sheet
+#[Get('/orders.{format}')]
+#[Role('owner')]
+public function export(string $format): Sheet
 {
-    return $this->usersSheet($format);
-}
-
-private function usersSheet(string $format): Sheet
-{
-    return Sheet::file("users.$format")
-        ->title('Users')
-        ->columns(['id' => 'ID', 'email' => 'Email'])
-        ->column('name', 'Name', fn(User $u): string => $u->fullName())
-        ->columns(['balance' => 'Balance', 'registered' => 'Registered'])
-        ->rows($this->users->all());
+    if (!in_array($format, ['csv', 'xlsx'], true)) {
+        throw new NotFoundException("No export as $format");
+    }
+    return $this->sheet("orders.$format", $this->orders->recent(90));
 }
 ```
 
-`views/Report.php`:
+`SalesPage` is a readonly class with the sheet as `public Sheet $latest`. From `views/Backoffice/Sales.php`:
 
 ```html
-<h1>Users</h1>
-{{ $this->sheet($model['users']) }}
-<p><a href="/admin/users.xlsx">Download as XLSX</a> · <a href="/admin/users.csv">CSV</a></p>
+@model (Bakery\Models\SalesPage)
+
+<section class="mt-10">
+    <h2 class="mb-3 flex flex-wrap items-baseline gap-4 text-lg font-semibold">
+        {{ $this->t('Orders of the last seven days') }}
+        <a href="/backoffice/orders.xlsx" class="text-sm font-normal underline">{{ $this->t('90 days as XLSX') }}</a>
+        <a href="/backoffice/orders.csv" class="text-sm font-normal underline">{{ $this->t('as CSV') }}</a>
+    </h2>
+    {{ $this->sheet($model->latest) }}
+</section>
 ```
 
-The output:
+The output, shortened to three columns:
 
 ```html
-<table class="wp-sheet"><caption>Users</caption><thead><tr><th scope="col">ID</th><th scope="col">Email</th><th scope="col">Name</th><th scope="col">Balance</th><th scope="col">Registered</th></tr></thead><tbody>
-<tr><td class="wp-sheet-num">1</td><td>ada@example.com</td><td>Ada Lovelace</td><td class="wp-sheet-num">1234,5</td><td>01.03.2026 09:15</td></tr>
-<tr><td class="wp-sheet-num">2</td><td>grace@example.com</td><td>Grace Hopper</td><td class="wp-sheet-num">-20</td><td>17.05.2026 14:00</td></tr>
+<table class="wp-sheet"><caption>Orders</caption><thead><tr><th scope="col">Order</th><th scope="col">Customer</th><th scope="col">Total (€)</th></tr></thead><tbody>
+<tr><td>3f9a1c07be</td><td>Lena</td><td class="wp-sheet-num">8,6</td></tr>
+<tr><td>81d2e4a90c</td><td>Paul</td><td class="wp-sheet-num">5,2</td></tr>
 </tbody></table>
 ```
 
-- The format of the sheet does not matter to the helper; `Sheet::file('users.html')` is just the natural name.
+- The format of the sheet does not matter to the helper; `Sheet::file('orders.html')` is just the natural name.
 - Labels, the caption and every cell are HTML-escaped by the helper. It returns the table as a `Waypoint\Html`, which `{{ }}` prints as it is.
 - Cells hold the text representation: `decimalSeparator`, `dateFormat` and `booleans` from [Configuration](configuration.md) apply.
 - The table has no styles of its own. Number cells carry `wp-sheet-num`, header cells `scope="col"`.
 
 ## Styling
 
-A view's sibling stylesheet is scoped to the view, so `views/Report.css` can style the table:
+A view's sibling stylesheet is scoped to the view, so `views/Backoffice/Sales.css` could style the table (the bakery styles it with Tailwind in its `assets/app.css` instead):
 
 ```css
 .wp-sheet { border-collapse: collapse; }
@@ -67,12 +76,10 @@ The layout includes it with `{{ $this->assetTags() }}`, and the element that sho
 
 ## Large tables
 
-The helper builds the whole table as one string before the view continues. For a page, keep the rows to what a person reads (the latest hundred orders) and link the download for the rest:
+The helper builds the whole table as one string before the view continues. For a page, keep the rows to what a person reads and link the download for the rest, as the sales page does with seven days on the page and 90 in the file:
 
 ```php
-return new View('Orders', [
-    'latest' => $this->ordersSheet('html')->rows($this->orders->latest(100)),
-]);
+latest: $this->sheet('orders.html', $this->orders->recent(7)),
 ```
 
 See also: [Formats and cell types](formats.md#html), [`HtmlWriter`](../reference/Waypoint/Export/Writers/HtmlWriter.md).

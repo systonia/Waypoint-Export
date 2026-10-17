@@ -11,10 +11,11 @@ use ReflectionClass;
  * route; ExportPlugin picks the Writer by the file's extension (or $format).
  *
  * ```php
- * return Sheet::file('users.xlsx')
- *     ->columns(['id' => 'ID', 'email' => 'Email'])
- *     ->column('name', 'Name', fn(User $u): string => $u->displayName())
- *     ->rows($this->users->all());
+ * $total = fn (Order $o) => $o->totalCents() / 100;
+ * return Sheet::file('orders.xlsx')
+ *     ->columns(['code' => 'Order', 'email' => 'Email'])
+ *     ->column('total', 'Total (€)', $total)
+ *     ->rows($this->orders->recent(90));
  * ```
  *
  * A row is an array or an object; a column reads the key or public property
@@ -49,7 +50,7 @@ final class Sheet
      * A sheet that downloads as $filename.
      *
      * @param string $filename The download's file name without a path: no `/`, `\`, `:`, `*`, `?`, `"`, `<`, `>`, `|` or control characters.
-     * @param string|null $format Writer name; default: the file's extension, lowercased (`users.xlsx` -> xlsx).
+     * @param string|null $format Writer name; default: the file's extension, lowercased (`orders.xlsx` -> xlsx).
      * @throws InvalidArgumentException when the file name is not plain, or the format (or extension) is not lowercase letters and digits
      */
     public static function file(string $filename, ?string $format = null): self

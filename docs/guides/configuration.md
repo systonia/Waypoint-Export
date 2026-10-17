@@ -4,14 +4,14 @@ description: ExportOptions with its CSV and XML settings, and the values for oth
 order: 50
 ---
 
-The plugin reads [`ExportOptions`](../reference/Waypoint/Export/ExportOptions.md), set like every Waypoint Options class with `$app->configure()`:
+The plugin reads [`ExportOptions`](../reference/Waypoint/Export/ExportOptions.md), set like every Waypoint Options class with `$app->configure()`. The Sonnenkorn bakery writes its CSV files in UTF-8 (from its `app.php`):
 
 ```php
-use Waypoint\Export\ExportOptions;
+use Waypoint\Export\{ExportOptions, ExportPlugin};
 
 $app->plugin(new ExportPlugin());
-$app->configure(function (ExportOptions $options) {
-    $options->csv->encoding = 'UTF-8';
+$app->configure(function (ExportOptions $export) {
+    $export->csv->encoding = 'UTF-8';
 });
 ```
 
@@ -51,7 +51,7 @@ $app->configure(function (ExportOptions $options) {
 });
 ```
 
-For files that a program reads rather than a person, UTF-8 keeps every character and `\n` is the usual line ending:
+For files that a program reads rather than a person, such as the price list for the shop's till, UTF-8 keeps every character and `\n` is the usual line ending:
 
 ```php
 $app->configure(function (ExportOptions $options) {
@@ -63,7 +63,7 @@ $app->configure(function (ExportOptions $options) {
 });
 ```
 
-Turn `guardFormulas` off only when the CSV never reaches a spreadsheet program and a leading `'` would change the data, for instance negative amounts stored as text like `-5 EUR`.
+Turn `guardFormulas` off only when the CSV never reaches a spreadsheet program and a leading `'` would change the data, for instance a stock correction stored as text like `-5 loaves`.
 
 The encoding is any name PHP's `mb_convert_encoding()` knows; characters it cannot represent become `?`. The `Content-Type` names it as charset (`text/csv; charset=windows-1252`).
 
@@ -81,7 +81,7 @@ use Waypoint\Environment;
 
 $app->configure(function (ExportOptions $options, Environment $env) {
     $options->xml->validate = $env->isDev();
-    $options->xml->rowElement = 'customer';
+    $options->xml->rowElement = 'order';
 });
 ```
 
@@ -89,10 +89,10 @@ See [XML with a schema](xml-schema.md) for what validation checks.
 
 ## Per export
 
-The options are app-wide. What differs per export is set on the sheet: the format (`Sheet::file('x.dat', 'csv')`), the title, the column names and types, and the XML schema. The cell values are yours to shape in a column closure: a date formatted as a string in the closure is written as that text:
+The options are app-wide. What differs per export is set on the sheet: the format (`Sheet::file('till.dat', 'csv')`), the title, the column names and types, and the XML schema. The cell values are yours to shape in a column closure. The bakery turns the pickup day into a `DateTimeImmutable`, so it is a date cell and shows as `17.10.2026 00:00` under the default `dateFormat`; a string returned by the closure is written as that text instead:
 
 ```php
-->column('day', 'Day', fn(Order $o): string => $o->placed->format('Y-m-d'))
+->column('pickup', 'Pickup', fn (Order $o): string => (new DateTimeImmutable($o->pickupDate))->format('d.m.Y'))
 ```
 
 See also: [Formats and cell types](formats.md), [`ExportOptions`](../reference/Waypoint/Export/ExportOptions.md).

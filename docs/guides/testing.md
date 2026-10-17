@@ -22,37 +22,57 @@ final class ExportTest extends TestCase
         $app->configure(function (ExportOptions $o) {
             $o->csv->encoding = 'UTF-8';
         });
-        $app->attach([ReportsController::class]);
+        $app->attach([RevenueController::class]);
     }
 
     public function testRevenueAsCsv(): void
     {
-        $this->get('/reports/revenue.csv')
+        $this->get('/backoffice/revenue.csv')
             ->assertOk()
             ->assertContentType('text/csv')
             ->assertHeader('Content-Disposition', 'attachment; filename="revenue.csv"; filename*=UTF-8\'\'revenue.csv')
-            ->assertBody("\xEF\xBB\xBFMonth;Net;Paid\r\n2026-09;18250,75;1\r\n2026-10;9100;0\r\n");
+            ->assertBody("\xEF\xBB\xBFDay;Revenue (€);Closed\r\n2026-10-02;412,6;0\r\n2026-10-03;0;1\r\n");
     }
 }
 ```
 
-with this controller:
+with this controller, two days of the bakery's revenue as fixed rows:
 
 ```php
-#[Controller('/reports')]
-final class ReportsController
+#[Controller('/backoffice')]
+final class RevenueController
 {
     #[Get('/revenue.{format}')]
     public function revenue(string $format): Sheet
     {
         return Sheet::file("revenue.$format")
             ->title('Revenue')
-            ->columns(['month' => 'Month', 'net' => 'Net', 'paid' => 'Paid'])
+            ->columns(['day' => 'Day', 'revenue' => 'Revenue (€)', 'closed' => 'Closed'])
             ->rows([
-                ['month' => '2026-09', 'net' => 18250.75, 'paid' => true],
-                ['month' => '2026-10', 'net' => 9100, 'paid' => false],
+                ['day' => '2026-10-02', 'revenue' => 412.6, 'closed' => false],
+                ['day' => '2026-10-03', 'revenue' => 0, 'closed' => true],
             ]);
     }
+}
+```
+
+The Sonnenkorn bakery tests its real export against Postgres, signed in as the owner, in `tests/Controllers/BackofficeControllerTest.php` (`AppTestCase` is its own `TestCase` with the app and the demo data):
+
+```php
+public function testTheOrdersExportAsCsvAndXlsx(): void
+{
+    $this->app()->get(Orders::class)->place([2 => 2], 'Lena', 'lena@example.test', date('Y-m-d', strtotime('tomorrow')), 'de');
+    $csv = $this->request('GET', '/backoffice/orders.csv')->withJwt(self::OWNER)->send()
+        ->assertOk()
+        ->assertContentType('text/csv')
+        ->body();
+    $this->assertStringContainsString('Order;Placed;Pickup;Customer;Email;Status;Items;Total (€)', $csv);
+    $this->assertStringContainsString(';Lena;lena@example.test;Not confirmed yet;2 × Dinkelbrötchen (4);6,8', $csv);
+
+    $this->request('GET', '/backoffice/orders.xlsx')->withJwt(self::OWNER)->send()
+        ->assertOk()
+        ->assertContentType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    $this->request('GET', '/backoffice/orders.pdf')->withJwt(self::OWNER)->send()->assertStatus(404);
 }
 ```
 
@@ -65,9 +85,9 @@ JSON Lines is easiest to check per value:
 ```php
 public function testRevenueAsJsonLines(): void
 {
-    $lines = array_map(json_decode(...), explode("\n", trim($this->get('/reports/revenue.jsonl')->assertOk()->body())));
-    $this->assertSame(18250.75, $lines[0]->net);
-    $this->assertTrue($lines[0]->paid);
+    $lines = array_map(json_decode(...), explode("\n", trim($this->get('/backoffice/revenue.jsonl')->assertOk()->body())));
+    $this->assertSame(412.6, $lines[0]->revenue);
+    $this->assertTrue($lines[1]->closed);
 }
 ```
 
@@ -77,14 +97,14 @@ XLSX and ODS are zip files; open the body with `ZipArchive` and look at the shee
 public function testRevenueAsXlsx(): void
 {
     $file = tempnam(sys_get_temp_dir(), 'xlsx');
-    file_put_contents($file, $this->get('/reports/revenue.xlsx')->assertOk()->body());
+    file_put_contents($file, $this->get('/backoffice/revenue.xlsx')->assertOk()->body());
     $zip = new ZipArchive();
     $this->assertTrue($zip->open($file));
     $sheet = (string) $zip->getFromName('xl/worksheets/sheet1.xml');
     $zip->close();
     unlink($file);
 
-    $this->assertStringContainsString('<c r="B2"><v>18250.75</v></c>', $sheet);   // a real number
+    $this->assertStringContainsString('<c r="B2"><v>412.6</v></c>', $sheet);   // a real number
 }
 ```
 
@@ -97,7 +117,7 @@ An unknown format is a server error; the testing kit sees the 500 and the log li
 ```php
 public function testAnUnknownFormatIsAServerError(): void
 {
-    $this->get('/reports/revenue.pdf')->assertStatus(500);
+    $this->get('/backoffice/revenue.pdf')->assertStatus(500);
 }
 ```
 
@@ -116,10 +136,10 @@ $options->csv->encoding = 'UTF-8';
 $writer = new CsvWriter(new Cells($options), $options);
 
 $csv = implode('', iterator_to_array($writer->stream(
-    Sheet::file('x.csv')->columns(['n' => 'N'])->rows([['n' => '=1+1']])
+    Sheet::file('customers.csv')->columns(['name' => 'Customer'])->rows([['name' => '=1+1']])
 ), false));
 
-$this->assertSame("\xEF\xBB\xBFN\r\n'=1+1\r\n", $csv);
+$this->assertSame("\xEF\xBB\xBFCustomer\r\n'=1+1\r\n", $csv);
 ```
 
 The same works for a writer of your own, such as the [Markdown writer](custom-formats.md#a-markdown-table-writer). `iterator_to_array(..., false)` matters: a generator's keys repeat.

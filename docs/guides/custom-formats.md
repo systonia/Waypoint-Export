@@ -23,7 +23,7 @@ The export plugin keeps its writers in a [`Writers`](../reference/Waypoint/Expor
 ```php
 <?php
 
-namespace Acme\Export;
+namespace Bakery\Export;
 
 use Waypoint\Export\{Cells, ExportPlugin, Sheet, Writer, Writers};
 use Waypoint\Plugin\PluginBase;
@@ -88,13 +88,13 @@ $app->plugin(new ExportPlugin());
 $app->plugin(new MarkdownExportPlugin());
 ```
 
-Now `Sheet::file('revenue.md')` downloads as
+Now `Sheet::file('revenue.md')` with the bakery's daily revenue (the shop was closed on 3 October, German Unity Day) downloads as
 
 ```text
-| Month | Net | Paid |
+| Day | Revenue (€) | Closed |
 | --- | --- | --- |
-| 2026-09 | 18250,75 | 1 |
-| 2026-10 | 9100 | 0 |
+| 2026-10-02 | 412,6 | 0 |
+| 2026-10-03 | 0 | 1 |
 ```
 
 with `Content-Type: text/markdown; charset=utf-8`, the same `Content-Disposition` and `Cache-Control` as every export, and `text/markdown` in the OpenAPI spec of every route that returns a `Sheet`.
@@ -142,15 +142,15 @@ yield self::line(array_map(fn(array $c): string => match (($c['meta'][Align::cla
 
 ```php
 Sheet::file('revenue.md')
-    ->columns(['month' => 'Month'])
-    ->column('net', 'Net')
+    ->columns(['day' => 'Day'])
+    ->column('revenue', 'Revenue (€)')
     ->meta(new Align('right'));
 ```
 
 ```text
-| Month | Net |
+| Day | Revenue (€) |
 | --- | ---: |
-| 2026-09 | 1,5 |
+| 2026-10-02 | 412,6 |
 ```
 
 The fixed-width writer of waypoint-export-fixed checks every column's meta before its first `yield` and throws an `InvalidArgumentException` naming the column without one, so a missing layout fails the request instead of producing a broken file.

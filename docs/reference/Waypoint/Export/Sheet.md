@@ -15,10 +15,11 @@ A downloadable table. Build it with the fluent API and return it from a
 route; ExportPlugin picks the Writer by the file's extension (or $format).
 
 ```php
-return Sheet::file('users.xlsx')
-    ->columns(['id' => 'ID', 'email' => 'Email'])
-    ->column('name', 'Name', fn(User $u): string => $u->displayName())
-    ->rows($this->users->all());
+$total = fn (Order $o) => $o->totalCents() / 100;
+return Sheet::file('orders.xlsx')
+    ->columns(['code' => 'Order', 'email' => 'Email'])
+    ->column('total', 'Total (€)', $total)
+    ->rows($this->orders->recent(90));
 ```
 
 A row is an array or an object; a column reads the key or public property
@@ -37,7 +38,7 @@ A sheet that downloads as $filename.
 **Parameters**
 
 - `$filename` `string`: The download's file name without a path: no `/`, `\`, `:`, `*`, `?`, `"`, `<`, `>`, `|` or control characters.
-- `$format` `string|null`: Writer name; default: the file's extension, lowercased (`users.xlsx` -> xlsx).
+- `$format` `string|null`: Writer name; default: the file's extension, lowercased (`orders.xlsx` -> xlsx).
 
 **Returns** [`Sheet`](Sheet.md)
 

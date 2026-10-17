@@ -7,29 +7,30 @@ order: 40
 An XML export is plain XML until the sheet names a schema. `schema()` sets the document's namespace and, optionally, the `xsi:schemaLocation` a recipient uses to find the XSD:
 
 ```php
-private function customerSheet(): Sheet
+private function salesSheet(): Sheet
 {
-    return Sheet::file('customers.xml')
-        ->title('customers')
-        ->schema('urn:example:customers', 'customers.xsd')
-        ->columnsOf(CustomerRow::class);
+    return Sheet::file('sales.xml')
+        ->title('sales')
+        ->schema('urn:sonnenkorn:sales', 'sales.xsd')
+        ->columnsOf(SalesRow::class);
 }
 
-#[Get('/customers.xml')]
-public function customers(): Sheet
+#[Get('/sales.xml')]
+#[Role('owner')]
+public function sales(): Sheet
 {
-    return $this->customerSheet()->rows(array_map(CustomerRow::of(...), $this->users->all()));
+    return $this->salesSheet()->rows($this->salesRows());
 }
 ```
 
-With `CustomerRow` from [Row classes](row-classes.md):
+With `SalesRow` from [Row classes](row-classes.md), and `salesRows()` running the query shown there:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<customers xmlns="urn:example:customers" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:example:customers customers.xsd">
-  <row><customerNo>1</customerNo><email>ada@example.com</email><balance>1234.5</balance><registered>2026-03-01T09:15:00+00:00</registered></row>
-  <row><customerNo>2</customerNo><email>grace@example.com</email><balance>-20</balance><registered>2026-05-17T14:00:00+00:00</registered></row>
-</customers>
+<sales xmlns="urn:sonnenkorn:sales" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:sonnenkorn:sales sales.xsd">
+  <row><day>2026-10-16T00:00:00+02:00</day><product>Lye pretzel</product><quantity>48</quantity><revenue>57.6</revenue></row>
+  <row><day>2026-10-16T00:00:00+02:00</day><product>Butter croissant</product><quantity>31</quantity><revenue>55.8</revenue></row>
+</sales>
 ```
 
 ## The generated XSD
@@ -46,40 +47,43 @@ With `CustomerRow` from [Row classes](row-classes.md):
 A route next to the export can serve it. The XML writer comes from the [`Writers`](../reference/Waypoint/Export/Writers.md) service the plugin puts into the container:
 
 ```php
-use Waypoint\Attributes\{Controller, FileFormatter, Get, Inject};
+use Waypoint\Attributes\{Authenticated, Controller, FileFormatter, Get, Inject};
 use Waypoint\Export\{Sheet, Writers};
 use Waypoint\Export\Writers\XmlWriter;
 
-#[Controller('/admin')]
-final class ExportController
+#[Controller('/backoffice')]
+#[Authenticated]
+final class SalesExportController
 {
     #[Inject]
     private Writers $writers;
 
-    #[Get('/customers.xsd')]
-    #[FileFormatter(mimetype: 'application/xml')]
+    #[Get('/sales.xsd')]
+    #[FileFormatter(
+        mimetype: 'application/xml'
+    )]
     public function schema(): string
     {
         $xml = $this->writers->for('xml');
         assert($xml instanceof XmlWriter);
-        return $xml->xsd($this->customerSheet());
+        return $xml->xsd($this->salesSheet());
     }
 }
 ```
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:example:customers" xmlns="urn:example:customers" elementFormDefault="qualified">
-  <xs:element name="customers">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:sonnenkorn:sales" xmlns="urn:sonnenkorn:sales" elementFormDefault="qualified">
+  <xs:element name="sales">
     <xs:complexType>
       <xs:sequence>
         <xs:element name="row" minOccurs="0" maxOccurs="unbounded">
           <xs:complexType>
         <xs:sequence>
-          <xs:element name="customerNo" type="xs:decimal" nillable="true"/>
-          <xs:element name="email" type="xs:string" nillable="true"/>
-          <xs:element name="balance" type="xs:decimal" nillable="true"/>
-          <xs:element name="registered" type="xs:dateTime" nillable="true"/>
+          <xs:element name="day" type="xs:dateTime" nillable="true"/>
+          <xs:element name="product" type="xs:string" nillable="true"/>
+          <xs:element name="quantity" type="xs:decimal" nillable="true"/>
+          <xs:element name="revenue" type="xs:decimal" nillable="true"/>
         </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -89,7 +93,7 @@ final class ExportController
 </xs:schema>
 ```
 
-The schema only needs the columns, so `customerSheet()` without rows serves both routes. Declaring `type` on the columns is what makes the XSD say more than `xs:string`; the XML itself looks the same either way.
+The schema only needs the columns, so `salesSheet()` without rows serves both routes. Declaring `type` on the columns is what makes the XSD say more than `xs:string`; the XML itself looks the same either way.
 
 ## Validating every document
 
@@ -101,17 +105,17 @@ $app->configure(function (ExportOptions $options, Environment $env) {
 });
 ```
 
-Without a schema file the generated XSD is used. For a schema you were given by the recipient, pass its path as the third argument:
+Without a schema file the generated XSD is used. For a schema you were given by the recipient, pass its path as the third argument. The bakery's flour order to its mill, in the mill's format:
 
 ```php
-Sheet::file('lieferung.xml')
-    ->title('lieferung')
-    ->schema('urn:partner:lieferung', 'https://partner.example/lieferung.xsd', xsd: __DIR__ . '/schemas/lieferung.xsd')
-    ->columnsOf(LieferungRow::class)
+Sheet::file('flour-order.xml')
+    ->title('order')
+    ->schema('urn:mill:orders', 'https://mill.test/orders.xsd', xsd: __DIR__ . '/schemas/mill-orders.xsd')
+    ->columnsOf(FlourOrderRow::class)
     ->rows($rows);
 ```
 
-A document that does not match throws a `RuntimeException` with libxml's messages, `XML export 'lieferung.xml' does not match its schema: …`; the route answers 500 and the message goes to the log. While validating, the writer builds the whole document in memory before it sends anything, so validation fits development and CI rather than large production exports.
+A document that does not match throws a `RuntimeException` with libxml's messages, `XML export 'flour-order.xml' does not match its schema: …`; the route answers 500 and the message goes to the log. While validating, the writer builds the whole document in memory before it sends anything, so validation fits development and CI rather than large production exports.
 
 ## Element names
 
