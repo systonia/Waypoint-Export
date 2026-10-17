@@ -32,9 +32,9 @@ private function usersSheet(string $format): Sheet
 
 `views/Report.php`:
 
-```php
+```html
 <h1>Users</h1>
-<?= $this->sheet($model['users']) ?>
+{{ $this->sheet($model['users']) }}
 <p><a href="/admin/users.xlsx">Download as XLSX</a> · <a href="/admin/users.csv">CSV</a></p>
 ```
 
@@ -48,7 +48,7 @@ The output:
 ```
 
 - The format of the sheet does not matter to the helper; `Sheet::file('users.html')` is just the natural name.
-- Labels, the caption and every cell are HTML-escaped by the helper. It returns the table as a `Waypoint\Html`, which `<?= ?>` prints as it is.
+- Labels, the caption and every cell are HTML-escaped by the helper. It returns the table as a `Waypoint\Html`, which `{{ }}` prints as it is.
 - Cells hold the text representation: `decimalSeparator`, `dateFormat` and `booleans` from [Configuration](configuration.md) apply.
 - The table has no styles of its own. Number cells carry `wp-sheet-num`, header cells `scope="col"`.
 
@@ -63,7 +63,7 @@ A view's sibling stylesheet is scoped to the view, so `views/Report.css` can sty
 .wp-sheet td.wp-sheet-num { text-align: right; font-variant-numeric: tabular-nums; }
 ```
 
-The layout includes it with `<?= $this->assetTags() ?>`, and the element that should receive it carries `<?= $this->scopeAttribute() ?>`, as for any Waypoint view.
+The layout includes it with `{{ $this->assetTags() }}`, and the element that should receive it carries `{{ $this->scopeAttribute() }}`, as for any Waypoint view.
 
 ## Large tables
 

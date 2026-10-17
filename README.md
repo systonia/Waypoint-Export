@@ -42,7 +42,7 @@ public function exportUsers(): Sheet
   properties in declaration order; other attributes on such a property become column meta for writers
   like `#[Fixed]`.
 - **`title()`** names the sheet in XLSX/ODS, the caption in HTML and the root element in XML.
-- **Inline table:** `<?= $this->sheet($sheet) ?>` in a view renders the same definition as an HTML table.
+- **Inline table:** `{{ $this->sheet($sheet) }}` in a view renders the same definition as an HTML table.
 
 ### Cell types
 
