@@ -5,7 +5,7 @@
     "license": ["MIT", "Apache-2.0"],
     "require": {
         "php": ">=8.5",
-        "systonia/waypoint": "^0.7.1"
+        "systonia/waypoint": "^0.7.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^13.3",
