@@ -48,7 +48,7 @@ final class TextWritersTest extends TestCase
             . '{"id":2,"name":"a;b \"q\"","amount":-3,"active":false,"since":null,"role":"=SUM(A1)","note":"ok"}' . "\n",
             $out
         );
-        $this->assertSame('{"fullName":"Ada"}' . "\n", Support::write($writer, Sheet::file('r.jsonl')->column('name', 'Name', name: 'fullName')->rows([new Row()])));
+        $this->assertSame('{"fullName":"Ada"}' . "\n", Support::write($writer, Sheet::file('r.jsonl')->column('name', 'Name', name: 'fullName')->rows([new UserRow()])));
     }
 
     public function testHtmlIsAStandalonePageAndFragmentIsJustTheTable(): void

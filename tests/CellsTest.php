@@ -17,7 +17,7 @@ final class CellsTest extends TestCase
         $this->assertSame(CellType::Number, $cells->cell(42)->type);
         $this->assertSame(CellType::Number, $cells->cell(1.5)->type);
         $this->assertSame(CellType::Date, $cells->cell(new DateTimeImmutable())->type);
-        $this->assertSame([CellType::Text, 'admin'], [$cells->cell(Role::Admin)->type, $cells->cell(Role::Admin)->value]);
+        $this->assertSame([CellType::Text, 'admin'], [$cells->cell(UserRole::Admin)->type, $cells->cell(UserRole::Admin)->value]);
         $this->assertSame([CellType::Text, '007'], [$cells->cell('007')->type, $cells->cell('007')->value], 'numeric strings stay text');
         $this->assertSame('["a",1]', $cells->cell(['a', 1])->value);
     }
@@ -61,7 +61,7 @@ final class CellsTest extends TestCase
         ];
 
         $this->assertSame([1, 'U', null], array_map(fn(Cell $c) => $c->value, $cells->row($columns, ['id' => 1])));
-        $this->assertSame([7, 'U', null], array_map(fn(Cell $c) => $c->value, $cells->row($columns, new Row())));
+        $this->assertSame([7, 'U', null], array_map(fn (Cell $c) => $c->value, $cells->row($columns, new UserRow())));
         $this->assertSame([null, 'U', null], array_map(fn(Cell $c) => $c->value, $cells->row($columns, 'not a row')));
     }
 

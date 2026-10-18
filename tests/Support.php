@@ -3,23 +3,7 @@
 namespace Waypoint\Export\Tests;
 
 use DateTimeImmutable;
-use Waypoint\Export\{Cells, CellType, Column, ExportOptions, Sheet};
-
-enum Role: string
-{
-    case Admin = 'admin';
-}
-
-final class Row
-{
-    #[Column('ID', type: CellType::Number)]
-    public int $id = 7;
-
-    public string $secret = 'never exported';
-
-    #[Column('Name', name: 'fullName')]
-    public string $name = 'Ada';
-}
+use Waypoint\Export\{Cells, CellType, ExportOptions, Sheet};
 
 final class Support
 {
@@ -47,7 +31,7 @@ final class Support
             ->column('role', 'Rolle')
             ->column('note', 'Notiz')
             ->rows([
-                ['id' => 1, 'name' => 'Zoë', 'amount' => 1234.5, 'active' => true, 'since' => new DateTimeImmutable('2026-09-16 21:30:00+02:00'), 'role' => Role::Admin, 'note' => null],
+                ['id' => 1, 'name' => 'Zoë', 'amount' => 1234.5, 'active' => true, 'since' => new DateTimeImmutable('2026-09-16 21:30:00+02:00'), 'role' => UserRole::Admin, 'note' => null],
                 ['id' => 2, 'name' => 'a;b "q"', 'amount' => -3, 'active' => false, 'since' => null, 'role' => '=SUM(A1)', 'note' => 'ok'],
             ]);
     }
