@@ -38,7 +38,7 @@ final class XlsxWriter implements Writer
             $cols .= '<col min="' . ($i + 1) . '" max="' . ($i + 1) . '" width="' . max(10, mb_strlen($column['label']) + 2) . '" customWidth="1"/>';
         }
         fwrite($out, '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="' . self::NS . "\"><cols>$cols</cols><sheetData>");
-        fwrite($out, '<row r="1">' . implode('', array_map(fn(int $i, array $c): string => self::inline(self::ref($i, 1), $c['label'], 2), array_keys($columns), $columns)) . '</row>');
+        fwrite($out, '<row r="1">' . implode('', array_map(fn (int $i, array $c): string => self::inline(self::ref($i, 1), $c['label'], 2), array_keys($columns), $columns)) . '</row>');
         $r = 1;
         foreach ($sheet->getRows() as $row) {
             $r++;

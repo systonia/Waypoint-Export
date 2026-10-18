@@ -58,7 +58,7 @@ final class MarkdownWriter implements Writer
     /** @param list<string> $cells */
     private static function line(array $cells): string
     {
-        return '| ' . implode(' | ', array_map(fn(string $c): string => str_replace(['|', "\n"], ['\|', ' '], $c), $cells)) . " |\n";
+        return '| ' . implode(' | ', array_map(fn (string $c): string => str_replace(['|', "\n"], ['\|', ' '], $c), $cells)) . " |\n";
     }
 }
 
@@ -133,7 +133,7 @@ final class Align
 ```
 
 ```php
-yield self::line(array_map(fn(array $c): string => match (($c['meta'][Align::class] ?? null)?->side) {
+yield self::line(array_map(fn (array $c): string => match (($c['meta'][Align::class] ?? null)?->side) {
     'right' => '---:',
     'center' => ':---:',
     default => '---',

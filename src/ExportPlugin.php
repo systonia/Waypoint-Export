@@ -74,7 +74,7 @@ final class ExportPlugin extends PluginBase implements Renderer, OpenApiExtensio
     /** `sheet`: `$this->sheet($sheet)` in a view returns the sheet as a bare HTML `<table>`, as Html. */
     public function helpers(): array
     {
-        return ['sheet' => fn(Sheet $sheet): Html => new Html(implode('', iterator_to_array($this->html->fragment($sheet), false)))];
+        return ['sheet' => fn (Sheet $sheet): Html => new Html(implode('', iterator_to_array($this->html->fragment($sheet), false)))];
     }
 
     public function describeParameter(array $parameter): ?array

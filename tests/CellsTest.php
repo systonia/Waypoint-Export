@@ -56,13 +56,13 @@ final class CellsTest extends TestCase
         $cells = Support::cells();
         $columns = [
             ['key' => 'id', 'value' => null],
-            ['key' => 'upper', 'value' => fn(mixed $row): string => 'U'],
+            ['key' => 'upper', 'value' => fn (mixed $row): string => 'U'],
             ['key' => 'missing', 'value' => null],
         ];
 
-        $this->assertSame([1, 'U', null], array_map(fn(Cell $c) => $c->value, $cells->row($columns, ['id' => 1])));
+        $this->assertSame([1, 'U', null], array_map(fn (Cell $c) => $c->value, $cells->row($columns, ['id' => 1])));
         $this->assertSame([7, 'U', null], array_map(fn (Cell $c) => $c->value, $cells->row($columns, new UserRow())));
-        $this->assertSame([null, 'U', null], array_map(fn(Cell $c) => $c->value, $cells->row($columns, 'not a row')));
+        $this->assertSame([null, 'U', null], array_map(fn (Cell $c) => $c->value, $cells->row($columns, 'not a row')));
     }
 
     public function testFormulaGuardAndSerialDates(): void

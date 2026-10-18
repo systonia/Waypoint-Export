@@ -14,8 +14,8 @@ final class PluginTest extends TestCase
         parent::setUp();
         $app = $this->app();
         $app->plugin(new ExportPlugin());
-        $app->configure(fn(ExportOptions $o) => $o->csv->encoding = 'UTF-8');
-        $app->configure(fn(RendererOptions $o) => $o->directory = __DIR__ . '/views');
+        $app->configure(fn (ExportOptions $o) => $o->csv->encoding = 'UTF-8');
+        $app->configure(fn (RendererOptions $o) => $o->directory = __DIR__ . '/views');
         $app->attach([ExportController::class]);
     }
 

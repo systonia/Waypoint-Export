@@ -36,7 +36,7 @@ final class HtmlWriter implements Writer
     {
         $columns = $sheet->getColumns();
         yield '<table class="wp-sheet"><caption>' . self::e($sheet->getTitle()) . '</caption><thead><tr>'
-            . implode('', array_map(fn(array $c): string => '<th scope="col">' . self::e($c['label']) . '</th>', $columns))
+            . implode('', array_map(fn (array $c): string => '<th scope="col">' . self::e($c['label']) . '</th>', $columns))
             . "</tr></thead><tbody>\n";
         foreach ($sheet->getRows() as $row) {
             $tds = '';

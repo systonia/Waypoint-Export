@@ -56,7 +56,7 @@ final class XmlWriter implements Writer
         }
         yield "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<$root$attrs>\n";
         $columns = $sheet->getColumns();
-        $names = array_map(fn(array $c): string => self::name($c['name']), $columns);
+        $names = array_map(fn (array $c): string => self::name($c['name']), $columns);
         $rowElement = self::name($this->xml->rowElement);
         foreach ($sheet->getRows() as $row) {
             $line = "  <$rowElement>";
@@ -100,7 +100,7 @@ final class XmlWriter implements Writer
         $dom->loadXML($document);
         $xsd = $sheet->getSchema()['xsd'] ?? null;
         $valid = $xsd !== null ? $dom->schemaValidate($xsd) : $dom->schemaValidateSource($this->xsd($sheet));
-        $errors = array_map(fn(\LibXMLError $e): string => trim($e->message), libxml_get_errors());
+        $errors = array_map(fn (\LibXMLError $e): string => trim($e->message), libxml_get_errors());
         libxml_clear_errors();
         libxml_use_internal_errors($previous);
         if (!$valid) {

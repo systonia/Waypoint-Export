@@ -42,7 +42,7 @@ final class OdsWriter implements Writer
         fwrite($out, '<?xml version="1.0" encoding="UTF-8"?><office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" office:version="1.2">'
             . '<office:body><office:spreadsheet><table:table table:name="' . self::e($sheet->getTitle()) . '">'
             . '<table:table-column table:number-columns-repeated="' . max(1, count($columns)) . '"/>');
-        fwrite($out, '<table:table-row>' . implode('', array_map(fn(array $c): string => self::string($c['label']), $columns)) . '</table:table-row>');
+        fwrite($out, '<table:table-row>' . implode('', array_map(fn (array $c): string => self::string($c['label']), $columns)) . '</table:table-row>');
         foreach ($sheet->getRows() as $row) {
             fwrite($out, '<table:table-row>' . implode('', array_map($this->xml(...), $this->cells->row($columns, $row))) . '</table:table-row>');
         }

@@ -27,7 +27,7 @@ final class CsvWriter implements Writer
     public function stream(Sheet $sheet): iterable
     {
         $columns = $sheet->getColumns();
-        yield ($this->utf8() ? "\xEF\xBB\xBF" : '') . $this->line(array_map(fn(array $c): string => $c['label'], $columns));
+        yield ($this->utf8() ? "\xEF\xBB\xBF" : '') . $this->line(array_map(fn (array $c): string => $c['label'], $columns));
         foreach ($sheet->getRows() as $row) {
             yield $this->line(array_map($this->cells->text(...), $this->cells->row($columns, $row)));
         }
