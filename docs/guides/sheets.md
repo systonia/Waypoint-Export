@@ -60,14 +60,12 @@ Sheet::file('stock.csv')
 
 Calls can be mixed; the columns appear in the order they were added. A closure is the place for anything derived: a formatted name, a value from a related object, a conversion from a database string.
 
-The bakery's `sheet()` helper builds every column of its orders export this way. The closures sit in variables first:
+The bakery's `sheet()` helper builds every column of its orders export this way, with the closures in variables to keep the calls short:
 
 ```php
 /** @param list<Order> $orders */
 private function sheet(string $file, array $orders): Sheet
 {
-    // The cells as closures in variables: passed inline, PHPStan would take their parameter from column()'s
-    // Closure(never) and lose the Order
     $placed = fn (Order $o) => new DateTimeImmutable($o->createdAt);
     $pickup = fn (Order $o) => new DateTimeImmutable($o->pickupDate);
     $customer = fn (Order $o) => $o->customerName;
@@ -88,7 +86,7 @@ private function sheet(string $file, array $orders): Sheet
 }
 ```
 
-`column()` declares its closure as `Closure(never): mixed`, so any typed closure is accepted. A closure written inline in the call would get its parameter type from that declaration, and PHPStan would no longer see the `Order`; in a variable, it keeps the type you wrote.
+`column()` takes the type of the closure's parameter as it is written, inline in the call or in a variable: PHPStan sees the `Order` inside the closure either way.
 
 The value a column produces decides how it is written: an `int` or `float` becomes a number, a `bool` a boolean, a `DateTimeInterface` a date, a backed enum its value, `null` an empty cell, and a string stays text, also `'007'` or `'0049 30'`, which keep their leading zeros. [Formats and cell types](formats.md) shows each format's representation.
 
