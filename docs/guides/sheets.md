@@ -99,7 +99,7 @@ The value a column produces decides how it is written: an `int` or `float` becom
 ->rows([['day' => '2026-10-02', 'revenue' => 412.6]])      // arrays
 ```
 
-A generator reads a large table without holding it in memory. Every order since the shop opened, 500 rows per query to `Tenma\Db\Postgres`:
+A generator reads a large table without holding it in memory. Every order since the shop opened, 500 rows per query to `Data\Postgres`:
 
 ```php
 #[Get('/orders-archive.csv')]
